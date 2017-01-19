@@ -33,7 +33,7 @@ use yii\helpers\ArrayHelper;
             </li>
             
                 <li class="nav-item start active open">
-                <a href="javascript:;" class="nav-link nav-toggle">
+                <a href="/php/demo/basic/web" class="nav-link nav-toggle">
                     <i class="icon-home"></i>
                     <span class="title">Blog</span>
                     <span class="selected"></span>
@@ -41,17 +41,17 @@ use yii\helpers\ArrayHelper;
                 </a>
                 <ul class="sub-menu">
                     <li class="nav-item start active open">
-                        <a href="create" class="nav-link ">
+                        <a href="/php/demo/basic/web/blog/create" class="nav-link ">
                             <i class="icon-bar-chart"></i>
                             <span class="title">Create</span>
                             <span class="selected"></span>
                         </a>
                     </li>
                     <li class="nav-item start ">
-                        <a href="index" class="nav-link ">
+                        <a href="/php/demo/basic/web/blog/" class="nav-link ">
                             <i class="icon-bulb"></i>
                             <span class="title">List</span>
-                            <span class="badge badge-success">1</span>
+                            <span class="selected"></span>
                         </a>
                     </li>
                 </ul>
