@@ -1,31 +1,13 @@
 <?php
 
 namespace app\models;
+use app\models\Users;
 
 class User extends \yii\base\Object implements \yii\web\IdentityInterface
 {
     public $id;
     public $username;
     public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
 
 
     /**
@@ -33,7 +15,21 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        $User = Users::find()->where(["id" => $id])->one();
+        if (!count($User))
+        {
+            return null;
+        }
+        else
+        {
+            $dbUser = [
+                'id' => $User->id,
+                'username' => $User->username,
+                'password' => $User->password,
+                
+            ];
+            return new static($dbUser);    
+        }
     }
 
     /**
@@ -58,13 +54,25 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public static function findByUsername($username)
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
+        $User = Users::find()->where(["username" => $username])->one(); 
+        if (!count($User))
+        {
+            return null;
         }
-
-        return null;
+        else
+        {
+            $flag=0;
+            if($flag == 0){
+                $dbUser = [
+                    'id' => $User->id,
+                    'username' => $User->username,
+                    'password' => $User->password,
+                    //'authKey' => "test".$User->id."key",
+                    //'accessToken' => "fashionapp".$User->id,
+                ];
+                return new static($dbUser);
+            }else return null;
+        }
     }
 
     /**
@@ -80,7 +88,8 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public function getAuthKey()
     {
-        return $this->authKey;
+        //return $this->authKey;
+        return $this->id;
     }
 
     /**
@@ -88,7 +97,8 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
+        //return $this->authKey === $authKey;
+        return $this->id === $id;
     }
 
     /**

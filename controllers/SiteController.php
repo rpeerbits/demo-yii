@@ -7,6 +7,8 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
+use app\models\User;
+use app\models\Users;
 use app\models\ContactForm;
 
 class SiteController extends Controller
@@ -19,21 +21,21 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['logout','index'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout','index'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
                 ],
             ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
+            //'verbs' => [
+            //    'class' => VerbFilter::className(),
+            //    'actions' => [
+            //        'logout' => ['post'],
+            //    ],
+            //],
         ];
     }
 
@@ -70,18 +72,68 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        $this->layout = '//login';
-        if (!Yii::$app->user->isGuest) {
+        
+        $this->layout = 'login';
+        //print_r(\Yii::$app->user->isGuest); die;
+        if (!\Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-
+        
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+        $user = new Users();
+        
+        
+        if($model->load(Yii::$app->request->post()) && $model->login())
+        {
+            if(isset($_POST['LoginForm']['rememberMe']) && $_POST['LoginForm']['rememberMe'] =="1")
+            {
+                $cookies = Yii::$app->response->cookies;
+                // add a new cookie to the response to be sent
+                
+                $no = rand(1,9);
+                
+                $v1 = $_POST['LoginForm']['username'];
+                $v2 = $_POST['LoginForm']['password'];
+                
+                for($i=1;$i<=$no;$i++){
+                    $v1 = base64_encode($v1);
+                    $v2 = base64_encode($v2);
+                }
+                
+                $cookies->add(new \yii\web\Cookie([
+                    'name' => Yii::$app->params['appcookiename'].'username',
+                    'value' => $v1,
+                ]));
+                
+                $cookies->add(new \yii\web\Cookie([
+                    'name' => Yii::$app->params['appcookiename'].'password',
+                    'value' => $v2,
+                ]));
+                
+                $cookies->add(new \yii\web\Cookie([
+                    'name' => Yii::$app->params['appcookiename'].'turns',
+                    'value' => $no,
+                ]));
+            }else{
+                
+
+            }
+            Yii::$app->session->set('logtime', time());
+            
             return $this->goBack();
+        } else {
+          //echo 'dfs';die;
+            if($model->load(Yii::$app->request->post()))
+            {
+                $msg = "username or password are wrong";
+                
+                \Yii::$app->getSession()->setFlash('flash_msg', $msg);
+            }
+            return $this->render('login', [
+                'model' => $model,
+                'user'=>$user,
+            ]);
         }
-        return $this->render('login', [
-            'model' => $model,
-        ]);
     }
 
     /**
@@ -121,6 +173,7 @@ class SiteController extends Controller
      */
     public function actionAbout()
     {
+        $this->layout = 'login';
         return $this->render('about');
     }
     
